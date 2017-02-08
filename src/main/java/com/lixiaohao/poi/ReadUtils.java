@@ -21,76 +21,107 @@ import java.util.Map;
 public class ReadUtils {
 
     /**
-     56      * Read the Excel 2010+
-     57      * @param path the path of the excel file
-     58      * @return
-     59      * @throws IOException
-     60      */
+     * Read the Excel 2010+
+     * @param
+     * @return
+     * @throws IOException
+           */
       public List<Map<String,String>> readXlsx(FileInputStream is) throws IOException {
 
           List<Map<String,String>> excelValues = new ArrayList<Map<String, String>>();
 
-          Map<String, String> excelValue ;
+         try {
+             Map<String, String> excelValue ;
 
-          XSSFWorkbook xssfWorkbook = new XSSFWorkbook(is);
+             XSSFWorkbook xssfWorkbook = new XSSFWorkbook(is);
 
-          // Read the Sheet
+             // Read the Sheet
 
-          //仅支持一个sheet
-          if(xssfWorkbook.getNumberOfSheets() <= 0 )
-              return excelValues;
-
-
-              XSSFSheet xssfSheet = xssfWorkbook.getSheetAt(0);
-
-              if (xssfSheet == null)
-                  return excelValues;
-
-              // Read the Row
-              int lastRowNum = xssfSheet.getLastRowNum();
-
-              if(lastRowNum<=1)
-                  return excelValues;
-
-              XSSFRow headRow = xssfSheet.getRow(1);
-
-              String[] headArgs = new String[headRow.getLastCellNum()+1];
-
-              for(int cellNum = 0 ;cellNum<headRow.getLastCellNum(); cellNum++){
-                  XSSFCell cell = headRow.getCell(cellNum);
-                  String value = "";
-                  if(cell != null){
-                      value = (cell.getStringCellValue()==null)?"":cell.getStringCellValue().trim();
-                  }
-                  headArgs[cellNum] = value;
-              }
+             //仅支持一个sheet
+             if(xssfWorkbook.getNumberOfSheets() <= 0 )
+                 return excelValues;
 
 
-              for (int rowNum = 2; rowNum <= lastRowNum; rowNum++) {
+             XSSFSheet xssfSheet = xssfWorkbook.getSheetAt(0);
 
-                  XSSFRow xssfRow = xssfSheet.getRow(rowNum);
+             if (xssfSheet == null)
+                 return excelValues;
 
-                  if (xssfRow != null) {
+             // Read the Row
+             int lastRowNum = xssfSheet.getLastRowNum();
 
-                    excelValue = new HashMap<String, String>();
-                    for(int cellIndex = 0;cellIndex < headArgs.length-1;cellIndex++){
+             if(lastRowNum<=1)
+                 return excelValues;
 
-                        XSSFCell nos = xssfRow.getCell(cellIndex);
+             XSSFRow headRow = xssfSheet.getRow(1);
 
-                        if(nos  == null)
-                            continue;
+             String[] headArgs = new String[headRow.getLastCellNum()+1];
 
-                        String value = (nos.getStringCellValue() == null)?null:nos.getStringCellValue().trim();
-                        excelValue.put(headArgs[cellIndex],value);
-                    }
+             for(int cellNum = 0 ;cellNum<headRow.getLastCellNum(); cellNum++){
+                 XSSFCell cell = headRow.getCell(cellNum);
+                 String value = "";
+                 if(cell != null){
+                     value = (cell.getStringCellValue()==null)?"":cell.getStringCellValue().trim();
+                 }
+                 headArgs[cellNum] = value;
+             }
 
-                      excelValues.add(excelValue);
 
-                  }
-              }
+             for (int rowNum = 2; rowNum <= lastRowNum; rowNum++) {
+
+                 XSSFRow xssfRow = xssfSheet.getRow(rowNum);
+
+                 if (xssfRow != null) {
+
+                     excelValue = new HashMap<String, String>();
+                     for(int cellIndex = 0;cellIndex < headArgs.length-1;cellIndex++){
+
+                         XSSFCell nos = xssfRow.getCell(cellIndex);
+
+                         if(nos  == null)
+                             continue;
+
+                         String value = getCellValue(nos);
+                         excelValue.put(headArgs[cellIndex],value);
+                     }
+
+                     excelValues.add(excelValue);
+
+                 }
+             }
+         }catch (Exception e){
+             e.printStackTrace();
+         }
 
         return excelValues;
 
+      }
+
+    /**
+     * 仅支持  文本类型 和 数值类型（如果为数值类型，则转化为字符串）
+     * @param xssfCell
+     * @return
+     */
+      public String getCellValue(XSSFCell xssfCell){
+
+          String value = null;
+
+          if( xssfCell == null )
+               value = null;
+
+          switch ( xssfCell.getCellType() ){
+              case XSSFCell.CELL_TYPE_STRING :
+                  value = (xssfCell.getStringCellValue() == null)?null:xssfCell.getStringCellValue().trim();
+                  break;
+//              case XSSFCell.CELL_TYPE_NUMERIC :
+//                  double numberic =  xssfCell.getNumericCellValue();
+//                  value = String.valueOf(numberic);
+//                  break;
+              default:
+                  throw new IllegalStateException("Cannot get a STRING value from a "+xssfCell.getCellTypeEnum()+" cell");
+          }
+
+          return value;
       }
 
       public List<Corporation> fillCorporations(List<Map<String,String>> maps){
