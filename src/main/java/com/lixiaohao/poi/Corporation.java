@@ -1,6 +1,7 @@
 package com.lixiaohao.poi;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by lixiaohao on 2017/2/7
@@ -90,7 +91,7 @@ public class Corporation {
     /***/
     private String goldMember;
     /***/
-//    private List<TradeShow> tradeShows;
+    private List<TradeShow> tradeShows;
     /**厂房面积*/
     private String factorySize;
     /**成立时间*/
@@ -98,7 +99,7 @@ public class Corporation {
     /**员工人数*/
     private String totalEmployees;
     //认证图片
-//    private List<Certification> certifications;
+    private List<Certification> certifications;
 
     //支付货币
     private String acceptedPaymentCurrency;
@@ -486,6 +487,21 @@ public class Corporation {
         this.listedCompanyCode = listedCompanyCode;
     }
 
+    public List<Certification> getCertifications() {
+        return certifications;
+    }
+
+    public void setCertifications(List<Certification> certifications) {
+        this.certifications = certifications;
+    }
+
+    public List<TradeShow> getTradeShows() {
+        return tradeShows;
+    }
+
+    public void setTradeShows(List<TradeShow> tradeShows) {
+        this.tradeShows = tradeShows;
+    }
 
     @Override
     public String toString() {
@@ -531,9 +547,11 @@ public class Corporation {
                 ", annualOutputValue='" + annualOutputValue + '\'' +
                 ", otherDesciption='" + otherDesciption + '\'' +
                 ", goldMember='" + goldMember + '\'' +
+                ", tradeShows=" + tradeShows +
                 ", factorySize='" + factorySize + '\'' +
                 ", yearEstablished='" + yearEstablished + '\'' +
                 ", totalEmployees='" + totalEmployees + '\'' +
+                ", certifications=" + certifications +
                 ", acceptedPaymentCurrency='" + acceptedPaymentCurrency + '\'' +
                 ", highestEverAnnualOutput='" + highestEverAnnualOutput + '\'' +
                 ", listedCompanyCode='" + listedCompanyCode + '\'' +

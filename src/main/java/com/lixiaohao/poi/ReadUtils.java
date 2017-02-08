@@ -19,6 +19,8 @@ import java.util.Map;
  * Description:
  */
 public class ReadUtils {
+    XSSFWorkbook xssfWorkbook = null;
+
 
     /**
      * Read the Excel 2010+
@@ -33,7 +35,7 @@ public class ReadUtils {
          try {
              Map<String, String> excelValue ;
 
-             XSSFWorkbook xssfWorkbook = new XSSFWorkbook(is);
+             xssfWorkbook = new XSSFWorkbook(is);
 
              // Read the Sheet
 
@@ -98,7 +100,7 @@ public class ReadUtils {
       }
 
     /**
-     * 仅支持  文本类型 和 数值类型（如果为数值类型，则转化为字符串）
+     * 仅支持  文本类型
      * @param xssfCell
      * @return
      */
@@ -146,6 +148,114 @@ public class ReadUtils {
 
                   String value = entry.getValue();
 
+                  //certifications
+                  if(key.equals("certifications")){
+
+                      if( value == null || value.equals(""))
+                          continue;
+
+                      List<Certification> certifications = new ArrayList<Certification>();
+
+                      String[] certificationNames = value.trim().split(",");
+
+                      Certification certification = null;
+
+                      for(String certificationName:certificationNames){
+
+                          if(certificationName == null || certificationName.trim().equals(""))
+                              continue;
+
+                          certification = new Certification();
+
+                          certification.setName(certificationName.trim());
+
+                          certifications.add(certification);
+                      }
+
+                     if(certifications.size()>0){
+                         Field field = clazz.getDeclaredField(key);
+
+                         field.setAccessible(true);
+
+                         field.set(corporation,certifications);
+                     }
+
+                      continue;
+                  }
+
+                  //tradeShows
+                  if(key.equals("tradeShows") ){
+
+                      if(value == null  || value.equals(""))
+                          continue;
+
+                      List<TradeShow> tradeShows = new ArrayList<TradeShow>();
+
+                      String[] tradeShowsValues = value.trim().split("\\[");
+
+                      TradeShow tradeShow = null;
+
+                      for(String tradeShowsValue:tradeShowsValues){
+
+                          if( tradeShowsValue == null || tradeShowsValue.trim().equals("") )
+                              continue;
+
+                          tradeShow = new TradeShow();
+
+                          String[] tradeShowStr = tradeShowsValue.replace("]","").split(",");
+
+                          for(String tradeShowValue:tradeShowStr){
+
+                              if(tradeShowValue == null || tradeShowValue.equals(""))
+                                  continue;
+
+                              int index = tradeShowValue.indexOf(":");
+
+                              if(index == -1)
+                                  continue;
+
+                              String valueStr = tradeShowValue.substring(index+1,tradeShowValue.length()).trim();
+
+                              if(valueStr == null || valueStr.equals(""))
+                              continue;
+
+                              if(tradeShowValue.contains("tradeShowName")){
+
+                                  tradeShow.setTradeShowName(valueStr);
+
+                                  continue;
+                              }
+                             if(tradeShowValue.contains("dateAttended")){
+
+                                  tradeShow.setDateAttended(valueStr);
+
+                                 continue;
+                              }
+                              if(tradeShowValue.contains("hostCountryOrRegion")){
+
+                                  tradeShow.setHostCountryOrRegion(valueStr);
+
+                                  continue;
+                              }
+
+                          }
+
+                          tradeShows.add(tradeShow);
+                      }
+
+                      if(tradeShows.size()>0){
+
+                          Field field = clazz.getDeclaredField(key);
+
+                          field.setAccessible(true);
+
+                          field.set(corporation,tradeShows);
+                      }
+
+                      continue;
+                  }
+
+
                   Field field = clazz.getDeclaredField(key);
 
                   field.setAccessible(true);
@@ -171,15 +281,6 @@ public class ReadUtils {
         try {
 
             List<Map<String,String>> excelValues =  readUtils.readXlsx(new FileInputStream(path));
-            for (Map<String,String> excelValue:excelValues){
-
-                System.out.println("第"+excelValues.indexOf(excelValue)+"条");
-                for(Map.Entry<String,String> entry:excelValue.entrySet()){
-                    System.out.print("key:"+entry.getKey()+"---value:"+entry.getValue()+"--");
-                }
-                System.out.println("");
-
-            }
             System.out.println("---------------------------------------");
             List<Corporation> corporations = readUtils.fillCorporations(excelValues);
 
@@ -190,6 +291,10 @@ public class ReadUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+//        String originalStr = "[a:b]";
+////        System.out.println(originalStr.substring(originalStr.indexOf(":")+1,originalStr.length()));
+//        System.out.println(originalStr.indexOf("00"));
     }
 
 }
