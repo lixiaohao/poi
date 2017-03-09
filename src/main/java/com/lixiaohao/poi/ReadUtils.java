@@ -1,6 +1,6 @@
 package com.lixiaohao.poi;
 
-import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.hssf.usermodel.HSSFDataFormatter;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -242,6 +242,10 @@ public class ReadUtils {
           switch ( xssfCell.getCellTypeEnum() ){
               case STRING :
                   value = (xssfCell.getStringCellValue() == null)?null:xssfCell.getStringCellValue().trim();
+                  break;
+              case NUMERIC:
+                  HSSFDataFormatter dataFormatter = new HSSFDataFormatter();
+                  value = dataFormatter.formatCellValue(xssfCell);
                   break;
               default:
                   throw new IllegalStateException("Cannot get a STRING value from a "+xssfCell.getCellTypeEnum()+" cell");

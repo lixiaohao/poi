@@ -51,4 +51,27 @@ public class TradeShow {
                 ", hostCountryOrRegion='" + hostCountryOrRegion + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TradeShow tradeShow = (TradeShow) o;
+
+        if (tradeShowName != null ? !tradeShowName.equals(tradeShow.tradeShowName) : tradeShow.tradeShowName != null)
+            return false;
+        if (dateAttended != null ? !dateAttended.equals(tradeShow.dateAttended) : tradeShow.dateAttended != null)
+            return false;
+        return hostCountryOrRegion != null ? hostCountryOrRegion.equals(tradeShow.hostCountryOrRegion) : tradeShow.hostCountryOrRegion == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = tradeShowName != null ? tradeShowName.hashCode() : 0;
+        result = 31 * result + (dateAttended != null ? dateAttended.hashCode() : 0);
+        result = 31 * result + (hostCountryOrRegion != null ? hostCountryOrRegion.hashCode() : 0);
+        return result;
+    }
 }
