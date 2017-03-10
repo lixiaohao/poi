@@ -1,9 +1,14 @@
 package com.lixiaohao.poi;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 /**
  * Created by lixiaohao on 2017/2/9
  *
@@ -12,15 +17,24 @@ import java.util.concurrent.TimeUnit;
  * @Company
  */
 public class Test {
-    public static void main(String[] args) {
-        String testStr = "1,2,3,4,5";
-        String[] str = testStr.split(",");
-        for(Object o:str){
-            if(o.equals("2")){
-                o = "0";
-                System.out.println("ddd");
-            }
-        }
-        System.out.println(testStr);
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) throws FileNotFoundException, IOException {
+        // TODO code application logic here
+
+        FileInputStream in = new FileInputStream("C:\\Users\\lixiaohao.ZZGRP\\Desktop\\temp\\studentsInsert.xlsx");
+        XSSFWorkbook wb = new XSSFWorkbook(in);
+        XSSFSheet sheet = wb.getSheetAt(0);
+
+       sheet.shiftRows(2,3,1,true,false);
+        sheet.createRow(2);
+
+        FileOutputStream myxlsout = new FileOutputStream("C:\\Users\\lixiaohao.ZZGRP\\Desktop\\temp\\studentsInsert1.xlsx");
+        wb.write(myxlsout);
+        myxlsout.close();
+
     }
+
+
 }

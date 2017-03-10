@@ -12,6 +12,8 @@ public class InnerBean {
     private String modelClassName;
     private String name;
     private String contact;
+    private String address;
+    private innerInner data;
 
     public InnerBean(String dataSource, String modelClassName, String name, String contact) {
         this.dataSource = dataSource;
@@ -53,6 +55,22 @@ public class InnerBean {
 
     public void setContact(String contact) {
         this.contact = contact;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public innerInner getData() {
+        return data;
+    }
+
+    public void setData(innerInner data) {
+        this.data = data;
     }
 
     @Override

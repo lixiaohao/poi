@@ -1,5 +1,7 @@
 package com.lixiaohao.poi;
 
+import java.util.List;
+
 /**
  * Created by lixiaohao on 2017/3/9
  *
@@ -14,6 +16,7 @@ public class OutBean {
     private String name;
     private InnerBean data;
 
+    private List<Price> prices;
     public OutBean() {
     }
 
@@ -45,6 +48,14 @@ public class OutBean {
         this.id = id;
         this.name = name;
         this.data = data;
+    }
+
+    public List<Price> getPrices() {
+        return prices;
+    }
+
+    public void setPrices(List<Price> prices) {
+        this.prices = prices;
     }
 
     @Override
