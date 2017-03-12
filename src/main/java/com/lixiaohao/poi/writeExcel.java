@@ -5,12 +5,13 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
 import org.junit.*;
+import org.junit.Test;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.lang.reflect.*;
 import java.util.*;
 
 /**
@@ -554,6 +555,75 @@ public class writeExcel {
             default:
                 break;
         }
+    }
+    private List parseListFields(Object parentObj,String fieldName){
+        List list = null;
+        if ( parentObj == null || fieldName == null || fieldName.trim().equals("") ){
+            throw new IllegalArgumentException("传入参数为空,请检查传入的参数。");
+        }
+
+        Class clazz = parentObj.getClass();
+
+        try {
+            Field field = clazz.getDeclaredField(fieldName);
+
+            if( !field.getType().isAssignableFrom(List.class) ){
+                throw new NoSuchFieldException("该属性不是List类型,请检查该属性。 属性名:"+fieldName);
+            }
+            Method get = clazz.getMethod(parGetName(fieldName));
+            list = (List) get.invoke(parentObj);
+
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }catch (NoSuchMethodException e){
+            e.printStackTrace();
+        }catch (IllegalAccessException e){
+            e.printStackTrace();
+        }catch (InvocationTargetException e){
+            e.printStackTrace();
+        }
+        return list;
+    }
+    private   String parGetName(String fieldName) {
+        if (null == fieldName || "".equals(fieldName)) {
+            return null;
+        }
+        int startIndex = 0;
+        if (fieldName.charAt(0) == '_')
+            startIndex = 1;
+        return "get"
+                + fieldName.substring(startIndex, startIndex + 1).toUpperCase()
+                + fieldName.substring(startIndex + 1);
+    }
+
+
+    @Test
+    public void Test(){
+        List<Price> prices = new ArrayList<Price>();
+        Price price1 = new Price();
+        price1.setOderQuanties("10");
+        price1.setUnitPrice("100$");
+
+        Price price2 = new Price();
+        price2.setOderQuanties("10");
+        price2.setUnitPrice("100$");
+
+        prices.add(price1);prices.add(price2);
+
+        InnerBean innerBean1 = new InnerBean("ALIBABA","com.lixiaohao.poi.InnerBean","lixaohao1","张三");
+        innerBean1.setAddress("南京东路1010号");
+
+        OutBean outBean1 = new OutBean("0101","outBean",innerBean1);
+        outBean1.setPrices(prices);
+
+        List list = parseListFields(outBean1,"prices");
+
+        for (Object o:list){
+            System.out.println(o.toString());
+        }
+
+
+
     }
 
 }
