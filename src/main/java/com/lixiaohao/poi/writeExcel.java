@@ -111,15 +111,20 @@ public class writeExcel {
             if(stack != 0){
                 throw new IllegalArgumentException("excel 开始和结束的标识格式不正确。");
             }*/
+      //0：没有循环体，1：只有#list-start #list-end 循环体，2：满足1，且有#list-entity-list #list-entity-end循环体
+            int status = 0;
+           Map<String,XSSFCell> lableMap = Label.fromatLabel(sheet);
 
-            Map<String,XSSFCell> lableMap = parseLabel(sheet);
+            Map<String,LabelMess> labelMessMap = Label.parseLabel(lableMap);
+
+
           if(lableMap == null || lableMap.size()<=0){
 
               startRow = sheet.getFirstRowNum();
               endRow = sheet.getLastRowNum();
               step = endRow - startRow +1;
               position = startRow + step;
-          }else {
+          }else if( labelMessMap.containsKey(Label.LIST)  ){
               XSSFCell startCell = lableMap.get(Label.LIST_START);
               XSSFCell endCell = lableMap.get(Label.LIST_END);
               startRow = startCell.getRowIndex()+1;
@@ -154,86 +159,7 @@ public class writeExcel {
     }
 
 
-    private Map<String,XSSFCell> parseLabel(XSSFSheet sheet){
 
-        Map<String,XSSFCell> lableMess = new HashMap<String, XSSFCell>();
-
-        List<String> startLabels = new ArrayList<String>();
-        List<String> endLabels = new ArrayList<String>();
-
-        for( int rowNum =0; rowNum <= sheet.getLastRowNum(); rowNum++ ){
-            XSSFRow row = sheet.getRow(rowNum);
-            if( row == null ){
-                continue;
-            }
-
-            int num = 0;
-            for( int colNum = 0; colNum <= row.getLastCellNum(); colNum++ ){
-
-                XSSFCell cell = row.getCell(colNum);
-
-                if( cell == null ){
-                    continue;
-                }
-                String v = cell.getStringCellValue();
-                if( v == null || v.trim().equals("") ){
-                    continue;
-                }
-                v = v.trim();
-                //解析出所有的标签  (以#开头)
-
-                if( v.startsWith("#") ){
-                    num++;
-                    if( num >1 ){
-                        throw  new IllegalArgumentException("同一行不允许出现多个标签! 标签名:"+ v );
-                    }
-                    Label.existCheck(v);
-
-                    lableMess.put(v,cell);
-                    if( v.endsWith(Label.start) ){ startLabels.add(v); }
-                    if( v.endsWith(Label.end) ){ endLabels.add(v); }
-
-                }
-            }
-        }
-
-        int len = startLabels.size() >= endLabels.size()? startLabels.size() : endLabels.size();
-        if(startLabels.size() >= endLabels.size()){
-
-            for( int i=0;i< len;i++ ){
-                Boolean flag = false;
-                String s = startLabels.get(i).replace(Label.start,"");
-                for( String end:endLabels ){
-                    String e = end.replace(Label.end,"");
-
-                    if( e.equals(s) ){
-                        flag = true;
-                    }
-
-                }
-                if( !flag ){
-                    throw  new IllegalArgumentException("标签没有闭合。缺少标签："+ s + Label.end );
-                }
-            }
-        }else {
-            for( int i=0;i< len;i++ ){
-                Boolean flag = false;
-                String e = endLabels.get(i).replace(Label.end,"");
-                for( String start:startLabels ){
-                    String s = start.replace(Label.start,"");
-
-                    if( e.equals(s) ){
-                        flag = true;
-                    }
-
-                }
-                if( !flag ){
-                    throw  new IllegalArgumentException("标签没有闭合。缺少标签："+ e + Label.start );
-                }
-            }
-        }
-        return lableMess;
-    }
 
 
     private void fillCell(XSSFCell cell,String fieldName,OutBean outBean) throws NoSuchFieldException, IllegalAccessException {
@@ -373,26 +299,6 @@ public class writeExcel {
 
         return fieldObject;
     }
-
-//    private String getChildFiledValue(Object obj,Class childClazz,String fieldName,String childFieldName) throws NoSuchFieldException, IllegalAccessException {
-//        String v = "";
-//
-//        Field field = obj.getClass().getDeclaredField(fieldName);
-//        field.setAccessible(true);
-//        if(!field.getGenericType().toString().equals(childClazz.toString())){
-//            return v;
-//        }
-//
-//        Object childObj = field.get(obj);
-//
-//        Field childField = childObj.getClass().getDeclaredField(childFieldName);
-//
-//        childField.setAccessible(true);
-//
-//        v = (String) childField.get(childObj);
-//        return v;
-//    }
-
 
     private Map<String,XSSFCell> fillContent( int startRow,int endRow,XSSFSheet sheet){
 
@@ -621,8 +527,6 @@ public class writeExcel {
         for (Object o:list){
             System.out.println(o.toString());
         }
-
-
 
     }
 
